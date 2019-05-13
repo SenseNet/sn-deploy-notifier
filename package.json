@@ -1,0 +1,57 @@
+{
+  "name": "sn-deploy-notifier",
+  "version": "1.0.0",
+  "description": "A probot app to show deployed sites from netlify.",
+  "author": "Zoltán Bedi <zoltan.bedi@gmail.com>",
+  "license": "ISC",
+  "repository": "https://github.com/SenseNet/sn-deploy-notifier.git",
+  "homepage": "https://github.com/SenseNet/sn-deploy-notifier",
+  "bugs": "https://github.com/SenseNet/sn-deploy-notifier/issues",
+  "keywords": [
+    "probot",
+    "github",
+    "probot-app"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "nodemon --exec \"npm start\"",
+    "start": "probot run ./lib/index.js",
+    "lint": "standard src/**/*.ts --fix",
+    "test": "jest && standard test/**/*.ts",
+    "test:watch": "jest --watch --notify --notifyMode=change --coverage"
+  },
+  "dependencies": {
+    "probot": "^9.2.10"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.12",
+    "@types/express": "^4.16.1",
+    "@types/nock": "^10.0.2",
+    "@types/node": "^12.0.0",
+    "@typescript-eslint/eslint-plugin": "^1.9.0",
+    "@typescript-eslint/parser": "^1.9.0",
+    "acorn": "^6.1.1",
+    "jest": "^24.8.0",
+    "nodemon": "^1.19.0",
+    "nock": "^10.0.6",
+    "smee-client": "^1.1.0",
+    "standard": "^12.0.1",
+    "ts-jest": "^24.0.2",
+    "typescript": "^3.4.5"
+  },
+  "engines": {
+    "node": ">= 8.3.0"
+  },
+  "standard": {
+    "parser": "@typescript-eslint/parser",
+    "env": [
+      "jest"
+    ],
+    "plugins": [
+      "@typescript-eslint/eslint-plugin"
+    ]
+  },
+  "jest": {
+    "testEnvironment": "node"
+  }
+}
