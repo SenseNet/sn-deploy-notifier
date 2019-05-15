@@ -17,6 +17,8 @@ export interface NetlifyPayload {
   deploy_time: number
 }
 
+export type Site = Pick<NetlifyPayload, 'site_id' | 'updated_at' | 'deploy_ssl_url' | 'name'>
+
 export interface PullRequests {
-  [index: string]: NetlifyPayload[]
+  [index: string]: Site[]
 }

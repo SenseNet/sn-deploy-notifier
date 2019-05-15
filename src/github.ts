@@ -2,7 +2,7 @@ import App from '@octokit/app'
 import request from '@octokit/request'
 import { findPrivateKey } from './private-key'
 import { Octokit } from 'probot'
-import { NetlifyPayload, PullRequests } from './models'
+import { NetlifyPayload, PullRequests, Site } from './models'
 import { writeFileSync } from 'fs'
 import path from 'path'
 
@@ -48,27 +48,28 @@ export class GithubService {
   }
 
   getCommentBody = async (netlifyPayload: NetlifyPayload) => {
+    const pickedNetlifyPayload = this.pickProperties(netlifyPayload)
     const filePath = path.join(process.cwd(), process.env.DATA_PATH!)
     const pullRequests = (await import(filePath)) as PullRequests
     delete pullRequests.default // we don't need this
     let prNumber = Object.keys(pullRequests).find(prNumber => prNumber === netlifyPayload.title)
 
     if (!prNumber) {
-      pullRequests[netlifyPayload.title] = [netlifyPayload]
+      pullRequests[netlifyPayload.title] = [pickedNetlifyPayload]
       prNumber = netlifyPayload.title
     } else {
       let found = false
       pullRequests[prNumber].forEach(site => {
-        if (site.site_id === netlifyPayload.site_id) {
-          site.deploy_ssl_url = netlifyPayload.deploy_ssl_url
-          site.updated_at = netlifyPayload.updated_at
-          site.name = netlifyPayload.name
+        if (site.site_id === pickedNetlifyPayload.site_id) {
+          site.deploy_ssl_url = pickedNetlifyPayload.deploy_ssl_url
+          site.updated_at = pickedNetlifyPayload.updated_at
+          site.name = pickedNetlifyPayload.name
           found = true
         }
       })
       // If site is not there already then add it
       if (!found) {
-        pullRequests[prNumber].push(netlifyPayload)
+        pullRequests[prNumber].push(pickedNetlifyPayload)
       }
     }
 
@@ -84,7 +85,19 @@ export class GithubService {
     return template
   }
 
-  createTemplate(sites: NetlifyPayload[]) {
+  private pickProperties(netlifyPayload: NetlifyPayload) {
+    return Object.assign<{}, Site>(
+      {},
+      {
+        deploy_ssl_url: netlifyPayload.deploy_ssl_url,
+        name: netlifyPayload.name,
+        site_id: netlifyPayload.site_id,
+        updated_at: netlifyPayload.updated_at
+      }
+    )
+  }
+
+  createTemplate(sites: Site[]) {
     const tableHeader = `| Site name | Url | Last deploy |\n|:-----------:|:---:|:------------:|`
     const template = sites.map(site => `| ${site.name} | ${site.deploy_ssl_url} | ${new Date(site.updated_at).toDateString()} |`)
     template.push(tableHeader)
