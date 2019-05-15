@@ -8,8 +8,8 @@ export interface NetlifyPayload {
   admin_url: string
   deploy_url: string
   deploy_ssl_url: string
-  created_at: Date
-  updated_at: Date
+  created_at: string
+  updated_at: string
   user_id: string
   error_message?: string
   title: string

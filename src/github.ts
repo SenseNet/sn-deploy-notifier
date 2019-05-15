@@ -57,15 +57,19 @@ export class GithubService {
       pullRequests[netlifyPayload.title] = [netlifyPayload]
       prNumber = netlifyPayload.title
     } else {
+      let found = false
       pullRequests[prNumber].forEach(site => {
         if (site.site_id === netlifyPayload.site_id) {
           site.deploy_ssl_url = netlifyPayload.deploy_ssl_url
           site.updated_at = netlifyPayload.updated_at
           site.name = netlifyPayload.name
-        } else {
-          pullRequests[prNumber!].push(netlifyPayload)
+          found = true
         }
       })
+      // If site is not there already then add it
+      if (!found) {
+        pullRequests[prNumber].push(netlifyPayload)
+      }
     }
 
     const json = JSON.stringify(pullRequests)
@@ -82,7 +86,7 @@ export class GithubService {
 
   createTemplate(sites: NetlifyPayload[]) {
     const tableHeader = `| Site name | Url | Last deploy |\n|:-----------:|:---:|:------------:|`
-    const template = sites.map(site => `| ${site.name} | ${site.deploy_ssl_url || '❌'} | ${site.updated_at.toLocaleString() || '❌'} |`)
+    const template = sites.map(site => `| ${site.name} | ${site.deploy_ssl_url} | ${new Date(site.updated_at).toDateString()} |`)
     template.push(tableHeader)
     return template.reverse().join('\n')
   }
