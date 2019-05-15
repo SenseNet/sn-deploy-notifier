@@ -34,7 +34,8 @@ export class GithubService {
     // Get pull request comments
     const comments = await this.octokit.issues.listComments({ owner: this.OWNER, repo: this.REPO, issue_number })
     const comment = comments.data.find(c => c.user.login === 'sensenet[bot]')
-    const body = await this.getCommentBody(netlifyPayload)
+    const pickedNetlifyPayload = this.pickProperties(netlifyPayload)
+    const body = await this.getCommentBody(pickedNetlifyPayload, netlifyPayload.title)
     if (comment) {
       this.octokit.issues.updateComment({ comment_id: comment.id, body, owner: this.OWNER, repo: this.REPO })
     } else {
@@ -47,29 +48,28 @@ export class GithubService {
     }
   }
 
-  getCommentBody = async (netlifyPayload: NetlifyPayload) => {
-    const pickedNetlifyPayload = this.pickProperties(netlifyPayload)
+  getCommentBody = async (netlifyPayload: Site, prNumber: string) => {
     const filePath = path.join(process.cwd(), process.env.DATA_PATH!)
     const pullRequests = (await import(filePath)) as PullRequests
     delete pullRequests.default // we don't need this
-    let prNumber = Object.keys(pullRequests).find(prNumber => prNumber === netlifyPayload.title)
+    let pullRequest = Object.keys(pullRequests).find(pr => pr === prNumber)
 
-    if (!prNumber) {
-      pullRequests[netlifyPayload.title] = [pickedNetlifyPayload]
-      prNumber = netlifyPayload.title
+    if (!pullRequest) {
+      pullRequests[prNumber] = [netlifyPayload]
+      pullRequest = prNumber
     } else {
       let found = false
-      pullRequests[prNumber].forEach(site => {
-        if (site.site_id === pickedNetlifyPayload.site_id) {
-          site.deploy_ssl_url = pickedNetlifyPayload.deploy_ssl_url
-          site.updated_at = pickedNetlifyPayload.updated_at
-          site.name = pickedNetlifyPayload.name
+      pullRequests[pullRequest].forEach(site => {
+        if (site.site_id === netlifyPayload.site_id) {
+          site.deploy_ssl_url = netlifyPayload.deploy_ssl_url
+          site.updated_at = netlifyPayload.updated_at
+          site.name = netlifyPayload.name
           found = true
         }
       })
       // If site is not there already then add it
       if (!found) {
-        pullRequests[prNumber].push(pickedNetlifyPayload)
+        pullRequests[pullRequest].push(netlifyPayload)
       }
     }
 
@@ -80,7 +80,7 @@ export class GithubService {
       console.log(error)
     }
 
-    const template = this.createTemplate(pullRequests[prNumber])
+    const template = this.createTemplate(pullRequests[pullRequest])
 
     return template
   }
@@ -99,7 +99,10 @@ export class GithubService {
 
   createTemplate(sites: Site[]) {
     const tableHeader = `| Site name | Url | Last deploy |\n|:-----------:|:---:|:------------:|`
-    const template = sites.map(site => `| ${site.name} | ${site.deploy_ssl_url} | ${new Date(site.updated_at).toDateString()} |`)
+    const template = sites.map(site => {
+      const date = new Date(site.updated_at)
+      return `| ${site.name} | ${site.deploy_ssl_url} | ${date.toDateString()} - ${date.toTimeString()} |`
+    })
     template.push(tableHeader)
     return template.reverse().join('\n')
   }

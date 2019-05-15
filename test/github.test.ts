@@ -1,5 +1,5 @@
 import { GithubService } from '../src/github'
-import { NetlifyPayload } from '../src/models'
+import { Site } from '../src/models'
 import mock from 'mock-fs'
 
 describe('Github service', () => {
@@ -27,57 +27,45 @@ describe('Github service', () => {
   afterEach(mock.restore)
 
   describe('its getCommentBody method', () => {
-    const netlifyPayload: Partial<NetlifyPayload> = {
+    const netlifyPayload: Site = {
       deploy_ssl_url: 'https://loving-mirzakhani-2a2f01.netlify.com',
       site_id: 'c0604e4d-d7a1-4be1-be6a-dcfb034032c0',
       name: 'dms',
-      updated_at: '2010.01.01',
-      title: '164'
+      updated_at: '2010.01.01'
     }
 
     it('should return a string with dms updated', async () => {
-      const result = await gh.getCommentBody(netlifyPayload as any)
+      const result = await gh.getCommentBody(netlifyPayload, '164')
 
       expect(result).toBe(`| Site name | Url | Last deploy |
 |:-----------:|:---:|:------------:|
-| dms2 | https://loving-mirzakhani-2a2f01.netlify.com | Thu Jan 01 1970 |
-| dms | https://loving-mirzakhani-2a2f01.netlify.com | Fri Jan 01 2010 |`)
+| dms2 | https://loving-mirzakhani-2a2f01.netlify.com | Thu Jan 01 1970 - 01:00:00 GMT+0100 (GMT+01:00) |
+| dms | https://loving-mirzakhani-2a2f01.netlify.com | Fri Jan 01 2010 - 00:00:00 GMT+0100 (GMT+01:00) |`)
     })
 
     it('should add a new entry to json if not found', async () => {
-      const result = await gh.getCommentBody({ ...netlifyPayload, title: '4' } as any)
+      const result = await gh.getCommentBody({ ...netlifyPayload }, '4')
 
-      expect(result).toBe(
-        `| Site name | Url | Last deploy |\n|:-----------:|:---:|:------------:|\n| dms | https://loving-mirzakhani-2a2f01.netlify.com | Fri Jan 01 2010 |`
-      )
+      expect(result).toBe(`| Site name | Url | Last deploy |
+|:-----------:|:---:|:------------:|
+| dms | https://loving-mirzakhani-2a2f01.netlify.com | Fri Jan 01 2010 - 00:00:00 GMT+0100 (GMT+01:00) |`)
     })
 
     it('should add a site that is not already added to pr', async () => {
-      const result = await gh.getCommentBody({
-        ...netlifyPayload,
-        site_id: 'newSIte',
-        name: 'snapp',
-        updated_at: new Date('2010.01.01')
-      } as any)
+      const result = await gh.getCommentBody(
+        {
+          ...netlifyPayload,
+          site_id: 'newSIte',
+          name: 'snapp',
+          updated_at: '2010.01.01'
+        },
+        '164'
+      )
 
       expect(result).toBe(`| Site name | Url | Last deploy |\n|:-----------:|:---:|:------------:|
-| snapp | https://loving-mirzakhani-2a2f01.netlify.com | Fri Jan 01 2010 |
-| dms2 | https://loving-mirzakhani-2a2f01.netlify.com | Thu Jan 01 1970 |
-| dms | https://loving-mirzakhani-2a2f01.netlify.com | Fri Jan 01 2010 |`)
-    })
-
-    it('should add a site that is not already added to pr only once', async () => {
-      const result = await gh.getCommentBody({
-        ...netlifyPayload,
-        site_id: 'newSIte',
-        name: 'snapp',
-        updated_at: '2010.01.01'
-      } as any)
-
-      expect(result).toBe(`| Site name | Url | Last deploy |\n|:-----------:|:---:|:------------:|
-| snapp | https://loving-mirzakhani-2a2f01.netlify.com | Fri Jan 01 2010 |
-| dms2 | https://loving-mirzakhani-2a2f01.netlify.com | Thu Jan 01 1970 |
-| dms | https://loving-mirzakhani-2a2f01.netlify.com | Fri Jan 01 2010 |`)
+| snapp | https://loving-mirzakhani-2a2f01.netlify.com | Fri Jan 01 2010 - 00:00:00 GMT+0100 (GMT+01:00) |
+| dms2 | https://loving-mirzakhani-2a2f01.netlify.com | Thu Jan 01 1970 - 01:00:00 GMT+0100 (GMT+01:00) |
+| dms | https://loving-mirzakhani-2a2f01.netlify.com | Fri Jan 01 2010 - 00:00:00 GMT+0100 (GMT+01:00) |`)
     })
   })
 })
