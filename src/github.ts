@@ -62,6 +62,8 @@ export class GithubService {
           site.deploy_ssl_url = netlifyPayload.deploy_ssl_url
           site.updated_at = netlifyPayload.updated_at
           site.name = netlifyPayload.name
+        } else {
+          pullRequests[prNumber!].push(netlifyPayload)
         }
       })
     }
