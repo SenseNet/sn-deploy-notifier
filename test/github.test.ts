@@ -65,7 +65,7 @@ describe('Github service', () => {
       expect(result).toBe(`| Site name | Url | Last deploy |\n|:-----------:|:---:|:------------:|
 | snapp | https://loving-mirzakhani-2a2f01.netlify.com | Fri Jan 01 2010 - 00:00:00 GMT+0100 (GMT+01:00) |
 | dms2 | https://loving-mirzakhani-2a2f01.netlify.com | Thu Jan 01 1970 - 01:00:00 GMT+0100 (GMT+01:00) |
-| dms | https://loving-mirzakhani-2a2f01.netlify.com | Fri Jan 01 2010 - 00:00:00 GMT+0100 (GMT+01:00) |`)
+| dms | https://loving-mirzakhani-2a2f01.netlify.com | Thu Jan 01 1970 - 01:00:00 GMT+0100 (GMT+01:00) |`)
     })
   })
 })

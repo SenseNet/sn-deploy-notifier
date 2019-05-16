@@ -3,7 +3,7 @@ import request from '@octokit/request'
 import { findPrivateKey } from './private-key'
 import { Octokit } from 'probot'
 import { NetlifyPayload, PullRequests, Site } from './models'
-import { writeFileSync } from 'fs'
+import { writeFileSync, readFileSync } from 'fs'
 import path from 'path'
 
 export class GithubService {
@@ -50,7 +50,8 @@ export class GithubService {
 
   getCommentBody = async (netlifyPayload: Site, prNumber: string) => {
     const filePath = path.join(process.cwd(), process.env.DATA_PATH!)
-    const pullRequests = (await import(filePath)) as PullRequests
+    const sitesJson = readFileSync(filePath, 'utf8')
+    const pullRequests = JSON.parse(sitesJson) as PullRequests
     delete pullRequests.default // we don't need this
     let pullRequest = Object.keys(pullRequests).find(pr => pr === prNumber)
 
