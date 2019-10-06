@@ -1,6 +1,17 @@
-sudo: false
+dist: bionic
+
 language: node_js
 node_js:
-  - "8.3"
+  - node  # use the latest version
+
+jobs:
+  include:
+    - stage: 'Tests'
+      name: 'Static Linting'
+      script: npm run lint
+
+    - name: 'Unit Tests'
+      script: npm test
+
 notifications:
   disabled: true
