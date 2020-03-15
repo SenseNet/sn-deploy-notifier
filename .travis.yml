@@ -7,10 +7,7 @@ node_js:
 jobs:
   include:
     - stage: 'Tests'
-      name: 'Static Linting'
-      script: npm run lint
-
-    - name: 'Unit Tests'
+      name: 'Unit Tests'
       script: npm test
 
 notifications:

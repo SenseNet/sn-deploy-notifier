@@ -1,4 +1,4 @@
-import App from '@octokit/app'
+import { App } from '@octokit/app'
 import request from '@octokit/request'
 import { findPrivateKey } from './private-key'
 import { Octokit } from 'probot'
