@@ -1,7 +1,7 @@
 import { App } from '@octokit/app'
 import request from '@octokit/request'
 import { findPrivateKey } from './private-key'
-import { Octokit } from 'probot'
+import { ProbotOctokit } from 'probot'
 import { NetlifyPayload, PullRequests, Site } from './models'
 import { writeFileSync, readFileSync } from 'fs'
 import path from 'path'
@@ -9,7 +9,7 @@ import path from 'path'
 export class GithubService {
   private OWNER = 'SenseNet'
   private REPO = 'sn-client'
-  private octokit = new Octokit({
+  private octokit = new ProbotOctokit({
     auth: async () => await this.getInstallationAccessToken()
   })
 
