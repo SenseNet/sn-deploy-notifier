@@ -1,4 +1,4 @@
-import fs from 'fs'
+import fs from 'fs';
 
 /**
  * Finds a private key through various user-(un)specified methods.
@@ -11,23 +11,23 @@ import fs from 'fs'
  * @returns {string} Private key
  * @private
  */
-export function findPrivateKey(filepath?: string): any {
+export function findPrivateKey(filepath?: string): string {
   if (filepath) {
-    return fs.readFileSync(filepath)
+    return fs.readFileSync(filepath, 'utf8');
   }
   if (process.env.PRIVATE_KEY) {
-    return process.env.PRIVATE_KEY.replace(/\\n/g, '\n')
+    return process.env.PRIVATE_KEY.replace(/\\n/g, '\n');
   }
   if (process.env.PRIVATE_KEY_PATH) {
-    return fs.readFileSync(process.env.PRIVATE_KEY_PATH)
+    return fs.readFileSync(process.env.PRIVATE_KEY_PATH, 'utf8');
   }
-  const foundPath = fs.readdirSync(process.cwd()).find(path => path.endsWith('.pem'))
+  const foundPath = fs.readdirSync(process.cwd()).find((path) => path.endsWith('.pem'));
   if (foundPath) {
-    return findPrivateKey(foundPath)
+    return findPrivateKey(foundPath);
   }
   throw new Error(`Missing private key for GitHub App. Please use:
   * \`--private-key=/path/to/private-key\` flag, or
   * \`PRIVATE_KEY\` environment variable, or
   * \`PRIVATE_KEY_PATH\` environment variable
-`)
+`);
 }

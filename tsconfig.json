@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "paths": { "*": ["types/*"] },
     "allowJs": false,
     "lib": ["es2015", "es2017"],
     "module": "commonjs",
@@ -20,8 +19,6 @@
     "declaration": true,
     "resolveJsonModule": true
   },
-  "include": [
-    "src/**/*"
-  ],
+  "include": ["src/**/*"],
   "compileOnSave": false
 }
