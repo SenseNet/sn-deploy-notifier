@@ -11,7 +11,6 @@ export class GithubService {
   private REPO = 'sn-client';
   private octokit = new Octokit({
     auth: async () => await this.getInstallationAccessToken(),
-    authStrategy: createAppAuth,
   });
 
   private getInstallationAccessToken = async () => {
